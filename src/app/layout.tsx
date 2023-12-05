@@ -4,7 +4,7 @@ import "./globals.css";
 
 const mont = Montserrat({ subsets: ["latin"] });
 
-export const jacques = Jacques_Francois({
+const jacques = Jacques_Francois({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-jacques",
