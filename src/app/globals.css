@@ -23,3 +23,13 @@ h1 {
 span {
   font-size: 1.2rem;
 }
+
+.link {
+  /* border: solid 3px #333; */
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
