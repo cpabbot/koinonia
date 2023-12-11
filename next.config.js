@@ -9,7 +9,7 @@ const nextConfig = {
    *
    * @see https://nextjs.org/docs/pages/building-your-application/deploying/static-exports
    */
-  // output: "export",
+  output: "export",
 
   /**
    * Disable server-based image optimization. Next.js does not support
@@ -23,3 +23,13 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+// module.exports = {
+//   async rewrites() {
+//       return [
+//         {
+//           source: '/:path*',
+//           destination: 'https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/:path*',
+//         },
+//       ]
+//     },
+// };
