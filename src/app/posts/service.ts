@@ -23,3 +23,7 @@ export async function createPost(formData: any) {
   );
   return response;
 }
+
+export async function deletePost() {
+  // console.log('delete');
+}
