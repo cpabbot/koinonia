@@ -12,24 +12,23 @@ type PostItem = {
 export default function PostsList() {
   const [data, setData] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(false);
   const [error, setError] = useState<string | null>();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (loading) {
-        try {
-          const result = await getData();
-          setData(result.Items);
-        } catch (error) {
-          setError("Error fetching data");
-        } finally {
-          setLoading(false);
-        }
+      try {
+        const result = await getData();
+        setData(result.Items);
+      } catch (error) {
+        setError("Error fetching data");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [loading]);
+  }, [refresh]);
 
   const PostListing = ({ item }: { item: PostItem }) => {
     return (
@@ -43,8 +42,11 @@ export default function PostsList() {
   };
 
   const handleSubmit = (formData: any) => {
-    createPost(formData);
     setLoading(true);
+    createPost(formData).then(() => {
+      setRefresh(!refresh);
+      setLoading(false);
+    });
   };
 
   const handleDelete = (formData: any) => {
