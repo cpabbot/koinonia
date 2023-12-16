@@ -5,8 +5,8 @@ import { createPost, deletePost, getData } from "./service";
 import styles from "./PostList.module.css";
 
 type PostItem = {
-  postID: any;
-  content: any;
+  postID: { S: number };
+  content: { S: string };
 };
 
 export default function PostsList() {
@@ -18,8 +18,10 @@ export default function PostsList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const result = await getData();
         setData(result.Items);
+        setLoading(false);
       } catch (error) {
         setError("Error fetching data");
       } finally {
@@ -34,7 +36,7 @@ export default function PostsList() {
     return (
       <div className={styles.postListing}>
         <span>{item.content.S}</span>
-        <button className="button" onClick={handleDelete}>
+        <button className="button" onClick={() => handleDelete(item.postID.S)}>
           delete
         </button>
       </div>
@@ -42,16 +44,15 @@ export default function PostsList() {
   };
 
   const handleSubmit = (formData: any) => {
-    setLoading(true);
     createPost(formData).then(() => {
       setRefresh(!refresh);
-      setLoading(false);
     });
   };
 
-  const handleDelete = (formData: any) => {
-    // deletePost(formData);
-    setLoading(true);
+  const handleDelete = (postID: number) => {
+    deletePost(postID).then(() => {
+      setRefresh(!refresh);
+    });
   };
 
   if (loading) return <p>Loading...</p>;

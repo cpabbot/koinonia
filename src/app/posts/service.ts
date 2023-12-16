@@ -24,6 +24,12 @@ export async function createPost(formData: any) {
   return response;
 }
 
-export async function deletePost() {
-  // console.log('delete');
+export async function deletePost(postID: number) {
+  const response = await fetch(
+    `https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/posts/${postID}`,
+    {
+      method: "DELETE",
+    }
+  );
+  return response;
 }
