@@ -20,16 +20,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+
+  /**
+   * Give static output folders, ex. "posts/ instead of posts.html"
+   */
+  trailingSlash: true,
 };
 
 module.exports = nextConfig;
-// module.exports = {
-//   async rewrites() {
-//       return [
-//         {
-//           source: '/:path*',
-//           destination: 'https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/:path*',
-//         },
-//       ]
-//     },
-// };
+
