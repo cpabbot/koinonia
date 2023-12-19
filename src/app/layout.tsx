@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat, Jacques_Francois } from "next/font/google";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
+import NextAuthProvider from "./NextAuthProvider";
 
 const mont = Montserrat({ subsets: ["latin"] });
 
@@ -21,8 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    
     <html lang="en" className={jacques.variable}>
-      <body className={mont.className}>{children}</body>
+      <body className={mont.className}><NextAuthProvider>{children}</NextAuthProvider></body>
     </html>
   );
 }
