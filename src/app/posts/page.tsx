@@ -18,7 +18,7 @@ Amplify.configure({
   },
 });
 
-export function Posts() {
+export default function Posts() {
   return (
     <main className={styles.main}>
       <Authenticator loginMechanisms={["username"]}>
@@ -31,4 +31,3 @@ export function Posts() {
   );
 }
 
-export default Posts;
