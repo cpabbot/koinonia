@@ -1,31 +1,34 @@
-import Link from "next/link";
+"use client";
+
 import styles from "./page.module.css";
 import PostsList from "./PostsList";
-import { createPost } from "./service";
-import {getIsAuthenticationFailure, getUser} from './auth';
-import Auth, {signInWithRedirect} from '@aws-amplify/auth';
 
-export default async function Posts() {
-  getUser().then(user => {
-    console.log('user', user);
-    if (!user) {
-        throw new Error('User not resolved');
-    }
-    return (
-      <main className={styles.main}>
+import { Amplify } from "aws-amplify";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+
+Amplify.configure({
+  Auth: {
+    // Connects with KoinoniaUsers User Pool
+    // Note that these identifiers should be moved to env
+    Cognito: {
+      userPoolClientId: "11bsgoodcjpe7qqpt9a6r83me9", //5h51v3emg4n1agf540qd6nrcqd",
+      userPoolId: "us-east-1_KAWpB6wsg", //us-east-1_7wOEXZQxU",
+    },
+  },
+});
+
+export function Posts() {
+  return (
+    <main className={styles.main}>
+      <Authenticator loginMechanisms={["username"]}>
         <h1>Koinonia</h1>
         <div style={{ width: "100%" }}>
           <PostsList />
         </div>
-      </main>
-    );
-    
-}).catch(() => {
-  console.log('error caught');
-    // don't redirect to login page if there was authentication failure to prevent redirection loop
-    // if (!getIsAuthenticationFailure())
-        signInWithRedirect();
-    // }
-});
-  
+      </Authenticator>
+    </main>
+  );
 }
+
+export default Posts;
