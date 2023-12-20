@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { createPost, deletePost, getData } from "./service";
 import styles from "./PostList.module.css";
+import { getCurrentUser } from "aws-amplify/auth";
 
 type PostItem = {
   postID: { S: number };
   content: { S: string };
+  author: { S: string };
 };
 
 export default function PostsList() {
@@ -35,7 +37,12 @@ export default function PostsList() {
   const PostListing = ({ item }: { item: PostItem }) => {
     return (
       <div className={styles.postListing}>
-        <span>{item.content.S}</span>
+        <div className={styles.flexVertical}>
+          <span>{item.content.S}</span>
+          {item.author && (
+            <span className={styles.author}>{item.author.S}</span>
+          )}
+        </div>
         <button className="button" onClick={() => handleDelete(item.postID.S)}>
           delete
         </button>
@@ -43,8 +50,9 @@ export default function PostsList() {
     );
   };
 
-  const handleSubmit = (formData: any) => {
-    createPost(formData).then(() => {
+  const handleSubmit = async (formData: any) => {
+    const { username } = await getCurrentUser();
+    createPost(formData, username).then(() => {
       setRefresh(!refresh);
     });
   };

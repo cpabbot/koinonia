@@ -9,9 +9,10 @@ export async function getData() {
   return res.json();
 }
 
-export async function createPost(formData: any) {
+export async function createPost(formData: any, username: string) {
   const postData = {
     content: formData.get("content"),
+    username: username,
   };
 
   const response = await fetch(
