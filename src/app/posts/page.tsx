@@ -21,7 +21,7 @@ Amplify.configure({
 export default function Posts() {
   return (
     <main className={styles.main}>
-      <Authenticator loginMechanisms={["username"]}>
+      <Authenticator loginMechanisms={["username", "email"]}>
         <h1>Koinonia</h1>
         <div style={{ width: "100%" }}>
           <PostsList />
