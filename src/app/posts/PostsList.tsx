@@ -1,9 +1,8 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { createPost, deletePost, getData } from "./service";
 import styles from "./PostList.module.css";
-import { getCurrentUser } from "aws-amplify/auth";
 
 type PostItem = {
   postID: { S: number };
@@ -51,10 +50,10 @@ export default function PostsList() {
   };
 
   const handleSubmit = async (formData: any) => {
-    const { username } = await getCurrentUser();
-    createPost(formData, username).then(() => {
-      setRefresh(!refresh);
-    });
+    // const { username } = await getCurrentUser();
+    // createPost(formData, username).then(() => {
+    //   setRefresh(!refresh);
+    // });
   };
 
   const handleDelete = (postID: number) => {
