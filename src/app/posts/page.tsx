@@ -2,31 +2,42 @@
 
 import styles from "./page.module.css";
 import PostsList from "./PostsList";
-
-import { Amplify } from "aws-amplify";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
-
-Amplify.configure({
-  Auth: {
-    // Connects with KoinoniaUsers User Pool
-    // Note that these identifiers should be moved to env
-    Cognito: {
-      userPoolClientId: "11bsgoodcjpe7qqpt9a6r83me9", //5h51v3emg4n1agf540qd6nrcqd",
-      userPoolId: "us-east-1_KAWpB6wsg", //us-east-1_7wOEXZQxU",
-    },
-  },
-});
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Posts() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  });
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }
+
   return (
     <main className={styles.main}>
-      <Authenticator loginMechanisms={["username", "email"]}>
+      {/* <Authenticator loginMechanisms={["username", "email"]}> */}
         <h1>Koinonia</h1>
         <div style={{ width: "100%" }}>
           <PostsList />
         </div>
-      </Authenticator>
+        <button onClick={handleLogout}>Log out</button>
+      {/* </Authenticator> */}
     </main>
   );
 }

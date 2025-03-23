@@ -1,12 +1,29 @@
 // "use server";
 
-export async function getData() {
-  const res = await fetch(
-    "https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/posts",
-    { cache: "no-store" }
-  );
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { db, auth } from "../firebase"
 
-  return res.json();
+export interface Post {
+  id: string;
+  message: string;
+  author: string;
+  [key: string]: any; // Optional: To allow additional fields
+}
+
+export function getUsername() {
+  const user = auth.currentUser;
+  
+  if(user) {
+    return user?.email;
+  }
+  return null;
+}
+
+export async function getData(): Promise<Post[]> {
+  const querySnapshot = await getDocs(collection(db, "posts"));
+  const posts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Post[];
+  console.log(posts);
+  return posts;
 }
 
 export async function createPost(formData: any, username: string) {
@@ -15,22 +32,18 @@ export async function createPost(formData: any, username: string) {
     username: username,
   };
 
-  const response = await fetch(
-    "https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/posts",
-    {
-      method: "POST",
-      body: JSON.stringify(postData),
-    }
-  );
-  return response;
+  try {
+    const docRef = await addDoc(collection(db, "posts"), {
+      author: username,
+      message: formData.get("content"),
+    });
+    return docRef;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 }
 
-export async function deletePost(postID: number) {
-  const response = await fetch(
-    `https://q3rj22ezm0.execute-api.us-east-1.amazonaws.com/posts/${postID}`,
-    {
-      method: "DELETE",
-    }
-  );
+export async function deletePost(postID: string) {
+  const response = await deleteDoc(doc(db, "posts", postID.toString()));
   return response;
 }

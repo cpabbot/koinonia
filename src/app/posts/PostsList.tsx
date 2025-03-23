@@ -1,18 +1,17 @@
-"use client"; // This is a client component 👈🏽
+"use client";
 
-import { useEffect, useState } from "react";
-import { createPost, deletePost, getData } from "./service";
+import { use, useEffect, useState } from "react";
+import { createPost, deletePost, getData, getUsername, Post } from "./service";
 import styles from "./PostList.module.css";
-import { getCurrentUser } from "aws-amplify/auth";
 
-type PostItem = {
-  postID: { S: number };
-  content: { S: string };
-  author: { S: string };
-};
+// type PostItem = {
+//   postID: { S: string };
+//   // content: { S: string };
+//   // author: { S: string };
+// };
 
 export default function PostsList() {
-  const [data, setData] = useState<PostItem[]>([]);
+  const [data, setData] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const [error, setError] = useState<string | null>();
@@ -22,7 +21,7 @@ export default function PostsList() {
       try {
         setLoading(true);
         const result = await getData();
-        setData(result.Items);
+        setData(result);
         setLoading(false);
       } catch (error) {
         setError("Error fetching data");
@@ -34,16 +33,14 @@ export default function PostsList() {
     fetchData();
   }, [refresh]);
 
-  const PostListing = ({ item }: { item: PostItem }) => {
+  const PostListing = ({ post }: { post: Post }) => {
     return (
       <div className={styles.postListing}>
         <div className={styles.flexVertical}>
-          <span>{item.content.S}</span>
-          {item.author && (
-            <span className={styles.author}>{item.author.S}</span>
-          )}
+          <span>{post.message}</span>
+          <span className={styles.author}>{post.author}</span>
         </div>
-        <button className="button" onClick={() => handleDelete(item.postID.S)}>
+        <button className="button" onClick={() => handleDelete(post.id)}>
           delete
         </button>
       </div>
@@ -51,13 +48,15 @@ export default function PostsList() {
   };
 
   const handleSubmit = async (formData: any) => {
-    const { username } = await getCurrentUser();
+    const username = getUsername();
+    console.log(username);
+    if(!username) throw new Error("No username found");
     createPost(formData, username).then(() => {
       setRefresh(!refresh);
     });
   };
 
-  const handleDelete = (postID: number) => {
+  const handleDelete = (postID: string) => {
     deletePost(postID).then(() => {
       setRefresh(!refresh);
     });
@@ -74,8 +73,8 @@ export default function PostsList() {
           Submit
         </button>
       </form>
-      {data.map((item) => (
-        <PostListing key={item.postID.S} item={item} />
+      {data.map((post) => (
+        <PostListing key={post.id} post={post} />
       ))}
     </div>
   );
