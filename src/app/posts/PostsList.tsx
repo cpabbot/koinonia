@@ -54,6 +54,7 @@ export default function PostsList() {
     const { username } = await getCurrentUser();
     createPost(formData, username).then(() => {
       setRefresh(!refresh);
+      sendNotification();
     });
   };
 
