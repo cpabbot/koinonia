@@ -3,6 +3,11 @@
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from "../firebase"
 
+import { getMatchingUsersForPost } from "@/lib/matching";
+import { hasNotified, recordNotification } from "@/lib/notifications";
+import { sendEmail } from "@/lib/email";
+import { postNotificationTemplate } from "@/lib/emailTemplates";
+
 export interface Post {
   id: string;
   message: string;
@@ -41,9 +46,39 @@ export async function createPost(formData: any, username: string) {
   } catch (e) {
     console.error("Error adding document: ", e);
   }
+
+  notifyUsers(postData); // Pass the post data to the notifyUsers function
 }
 
 export async function deletePost(postID: string) {
   const response = await deleteDoc(doc(db, "posts", postID.toString()));
   return response;
+}
+
+async function notifyUsers(post: any) {
+  // Find users whose filters match this post
+  const users = await getMatchingUsersForPost(post);
+
+   // testing
+   await sendEmail({
+      to: 'cpabbot1@gmail.com',
+      subject: `New post: ${post.title}`,
+      html: postNotificationTemplate(post),
+    });
+
+  // Notify each user
+  for (const user of users) {
+    const alreadySent = await hasNotified(user.id, post.id);
+    if (alreadySent) continue;
+
+    await sendEmail({
+      to: user.email,
+      subject: `New post: ${post.title}`,
+      html: postNotificationTemplate(post),
+    });
+
+    await recordNotification(user.id, post.id);
+  }
+
+  return Response.json({ success: true, postId: post.id });
 }
