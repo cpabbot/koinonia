@@ -42,12 +42,11 @@ export async function createPost(formData: any, username: string) {
       author: username,
       message: formData.get("content"),
     });
+    notifyUsers(postData);
     return docRef;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
-
-  notifyUsers(postData); // Pass the post data to the notifyUsers function
 }
 
 export async function deletePost(postID: string) {
@@ -56,8 +55,8 @@ export async function deletePost(postID: string) {
 }
 
 async function notifyUsers(post: any) {
-  // Find users whose filters match this post
-  const users = await getMatchingUsersForPost(post);
+  console.log("Notifying users about new post:", post);
+  // const users = await getMatchingUsersForPost(post);
 
    // testing
    await sendEmail({
@@ -67,18 +66,18 @@ async function notifyUsers(post: any) {
     });
 
   // Notify each user
-  for (const user of users) {
-    const alreadySent = await hasNotified(user.id, post.id);
-    if (alreadySent) continue;
+  // for (const user of users) {
+  //   const alreadySent = await hasNotified(user.id, post.id);
+  //   if (alreadySent) continue;
 
-    await sendEmail({
-      to: user.email,
-      subject: `New post: ${post.title}`,
-      html: postNotificationTemplate(post),
-    });
+  //   await sendEmail({
+  //     to: user.email,
+  //     subject: `New post: ${post.title}`,
+  //     html: postNotificationTemplate(post),
+  //   });
 
-    await recordNotification(user.id, post.id);
-  }
+  //   await recordNotification(user.id, post.id);
+  // }
 
   return Response.json({ success: true, postId: post.id });
 }
