@@ -59,11 +59,12 @@ async function notifyUsers(post: any) {
   // const users = await getMatchingUsersForPost(post);
 
    // testing
-   await sendEmail({
+   let response = await sendEmail({
       to: 'cpabbot1@gmail.com',
       subject: `New post: ${post.title}`,
       html: postNotificationTemplate(post),
     });
+    console.log("Email sent response:", response);
 
   // Notify each user
   // for (const user of users) {
